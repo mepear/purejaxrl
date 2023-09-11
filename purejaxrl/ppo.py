@@ -1,13 +1,16 @@
-import jax
-import jax.numpy as jnp
-import flax.linen as nn
 import numpy as np
+import time
 import optax
-from flax.linen.initializers import constant, orthogonal
 from typing import Sequence, NamedTuple, Any
-from flax.training.train_state import TrainState
 import distrax
 import gymnax
+import jax
+import jax.numpy as jnp
+
+import flax.linen as nn
+from flax.linen.initializers import constant, orthogonal
+from flax.training.train_state import TrainState
+
 from purejaxrl.wrappers import LogWrapper, FlattenObservationWrapper
 
 
@@ -289,5 +292,7 @@ if __name__ == "__main__":
         "DEBUG": True,
     }
     rng = jax.random.PRNGKey(30)
+    t0 = time.time()
     train_jit = jax.jit(make_train(config))
-    out = train_jit(rng)
+    out = jax.block_until_ready(train_jit(rng))
+    print(f"time: {time.time() - t0:.2f} s")
